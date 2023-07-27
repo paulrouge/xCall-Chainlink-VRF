@@ -1,11 +1,11 @@
-./hardhat/.env
-./hardhat/notes.md
-./hardhat/package.json
-./hardhat/hardhat.config.js
-./hardhat/cache
-./hardhat/artifacts
+hardhat/.env
+hardhat/notes.md
+hardhat/package.json
+hardhat/hardhat.config.js
+hardhat/cache
+hardhat/artifacts
 .vscode
-./hardhat/node_modules
+hardhat/node_modules
 
-./icon/.env
+icon/.env
 icon/wallets/*
