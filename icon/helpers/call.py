@@ -1,5 +1,5 @@
 from iconsdk.builder.call_builder import CallBuilder
-from iconsdk.builder.transaction_builder import CallTransactionBuilder
+from iconsdk.builder.transaction_builder import CallTransactionBuilder, TransactionBuilder
 from iconsdk.builder.transaction_builder import DeployTransactionBuilder
 from iconsdk.signed_transaction import SignedTransaction
 
@@ -57,7 +57,7 @@ def deployContract(icon_service, nid, wallet, filename, params):
     print(tx)
 
 def getBytesFile(filename):
-    with open(f'jar/{filename}', "rb") as binary_file:
+    with open(f'jars/{filename}', "rb") as binary_file:
         # Read the whole file at once
         data = binary_file.read()
     return data
@@ -81,6 +81,23 @@ def reDeployContract(icon_service, nid, wallet, to, filename, params):
         .content_type("application/java")\
         .content(getBytesFile(filename))\
         .params(params)\
+        .build()
+    
+    # Returns the signed transaction object having a signature
+    signed_transaction = SignedTransaction(transaction, wallet)
+    tx = icon_service.send_transaction(signed_transaction)
+    
+    print(tx)
+
+def transferICX(icon_service,nid, wallet, to, value ):
+    # Generates an instance of transaction for sending icx.
+    transaction = TransactionBuilder()\
+        .from_(wallet.get_address())\
+        .to(to)\
+        .value(value)\
+        .step_limit(1000000)\
+        .nid(nid)\
+        .nonce(100)\
         .build()
     
     # Returns the signed transaction object having a signature
