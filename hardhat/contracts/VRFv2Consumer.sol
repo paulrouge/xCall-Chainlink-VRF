@@ -34,7 +34,7 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
     // this limit based on the network that you select, the size of the request,
     // and the processing of the callback request in the fulfillRandomWords()
     // function.
-    uint32 constant CALLBACK_GAS_LIMIT = 100000;
+    uint32 constant CALLBACK_GAS_LIMIT = 400000;
 
     // The default is 3, but you can set this higher.
     uint16 constant REQUEST_CONFIRMATIONS = 3;
@@ -47,7 +47,7 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
     address constant xCallAddressSepolia = 0x694C1f5Fb4b81e730428490a1cE3dE6e32428637;
 
     // the btp address of the dapp on Berlin
-    string public dappAddressBerlin = "btp://0x7.icon/cx11abaf2847e54d09e2d89cf813f9f1a057d7b019";
+    string public dappAddressBerlin = "btp://0x7.icon/cx39bf06738279054733580d179ce6eab0ed19a8c2";
 
     // owner can set the dapp address on Berlin
     function setDappAddressBerlin(string calldata _dappAddressBerlin) external onlyOwner {
@@ -58,9 +58,13 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
     uint256 public s_requestId;
     address s_owner;
 
+    // map berlinReqId to VRF requestId
+    mapping(uint256 => uint256) public VRFReqIdtoBerlinReqId;
+
     event ReturnedRandomness(uint256[] randomWords);
-    event randomWordRequested(string from, uint256 requestId);
-    event xCallExecuted(string from, uint256 requestId);
+    event My_Event_randomWordRequested(string from, uint256 requestId);
+    event My_Event_xCallExecuted(string from, uint256 requestId);
+
 
     /**
     * @notice Constructor inherits VRFConsumerBaseV2
@@ -91,12 +95,11 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
         dappAddressBerlin = _dappAddressBerlin;
     }
 
-
     /**
     * @notice Requests randomness
     * Assumes the subscription is funded sufficiently; "Words" refers to unit of data in Computer Science
     */
-    function requestRandomWords(string calldata _from) internal {
+    function _requestRandomWords(uint256 _berlinReqId) internal {
         // Will revert if subscription is not set and funded.
         s_requestId = COORDINATOR.requestRandomWords(
             s_keyHash,
@@ -106,27 +109,31 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
             NUM_WORDS
         );
 
-        emit randomWordRequested(_from , s_requestId);
+        // map berlinReqId to VRF requestId
+        VRFReqIdtoBerlinReqId[s_requestId] = _berlinReqId;
     }
 
-    function sendXCallMessage(uint256 _randomWords) payable public {
-        uint256 xCallFee = getXCallFee("0x7.icon", true); // try with false, would be better/cheaper
+    // the contract will have to have funds to pay the xcall fee
+    function sendXCallMessage(uint256 _berlinReqId, uint256 _randomWords) internal {
+        // determine who can calll this actually...
         
-        // Ensure that the sent Ether covers the xCallFee
-        require(msg.value >= xCallFee, "Insufficient Ether sent to cover xCallFee");
+        uint256 xCallFee = getXCallFee("0x7.icon", false); // try with false, would be better/cheaper
+        
+        // ensure the contract has enough funds to pay the xcall fee
+        require(address(this).balance >= xCallFee, "Not enough funds to pay the xcall fee");
 
-        // Deduct the xCallFee from the sent Ether, and any excess will be returned to the sender
-        uint256 amountToSendBack = msg.value - xCallFee;
-        if (amountToSendBack > 0) {
-            payable(msg.sender).transfer(amountToSendBack);
-        }
+        // convert _berlinReqId to bytes
+        bytes memory _berlinReqIdBytes = abi.encode(_berlinReqId);
 
         // convert _randomWords to bytes
         bytes memory _randomWordsBytes = abi.encode(_randomWords);
 
-        ICallService(xCallAddressSepolia).sendCallMessage{value:msg.value}(
+        // concat _berlinReqIdBytes and _randomWordsBytes
+        bytes memory _data = abi.encodePacked(_berlinReqIdBytes, _randomWordsBytes);
+
+        ICallService(xCallAddressSepolia).sendCallMessage{value:xCallFee}(
             dappAddressBerlin,
-            _randomWordsBytes,
+            _data,
             "" 
         );
     }
@@ -134,19 +141,17 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
     /**
     * @notice Callback function used by VRF Coordinator
     *
-    * @param  - id of the request
+    * @param requestId - id of the request
     * @param randomWords - array of random results from VRF Coordinator
     */
     function fulfillRandomWords(
-        uint256 /* requestId */,
+        uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
         s_randomWords = randomWords;
-        
         uint256 _randomWords = randomWords[0];
         
-        sendXCallMessage(_randomWords);
-        emit ReturnedRandomness(randomWords);
+        sendXCallMessage(VRFReqIdtoBerlinReqId[requestId], _randomWords);
     }
 
 
@@ -160,6 +165,20 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
     }
 
 
+    function bytesToUint256(bytes memory input) internal pure returns (uint256) {
+        require(input.length <= 32, "Input length exceeds 32 bytes");
+
+        uint256 result = 0;
+        for (uint256 i = 0; i < input.length; i++) {
+            result = result * 256 + uint256(uint8(input[i]));
+        }
+
+        return result;
+    }
+
+
+
+
     /**
     @notice Handles the call message received from the source chain.
     @dev Only called from the Call Message Service.
@@ -170,13 +189,27 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
         string calldata _from,
         bytes calldata _data
     ) external override onlyCallService {
-  
-        // normal message delivery
-        // string memory msgData = string(_data);
+        // convert _data to uint256, revert if not possible
+        // uint256 _berlinReqId = abi.decode(bytes(_data), (uint256));
+        // string memory hexString = string(abi.encodePacked(_data[2], _data[3]));
 
-        // emit MessageReceived(_from, _data);
-        requestRandomWords(_from);
-        emit xCallExecuted(_from, s_requestId);
+        uint256 _berlinReqId = bytesToUint256(_data);
+ 
+        _requestRandomWords(_berlinReqId);
+        // emit My_Event_xCallExecuted(_from, _berlinReqId);
+
+
+        // THIS WORKED:
+        // uint256 xCallFee = getXCallFee("0x7.icon", true); // try with false, would be better/cheaper
+        // bytes memory _randomWordsBytes = abi.encode(1234567890000000000);
+        
+        // emit test(_berlinReqId);
+
+        // ICallService(xCallAddressSepolia).sendCallMessage{value:xCallFee, gas:600000}(
+        //     dappAddressBerlin,
+        //     _randomWordsBytes,
+        //     "" 
+        // );
         
     }
 
@@ -184,4 +217,10 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
         require(msg.sender == xCallAddressSepolia);
         _;
     }
+
+    // test event for bytes
+    event test(uint256 data);
+
+    // receive ether
+    receive() external payable {}
 }

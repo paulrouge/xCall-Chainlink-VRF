@@ -28,13 +28,14 @@ async function main() {
 
     // Create a contract instance using the ABI and address
     const contract = new hre.ethers.Contract(xCallAddress, contractABI, signer); // Using the signer to send a transaction
+    
 
-    const reqId = 138;
-    // const data = ethers.utils.formatBytes32String(""); // Convert the string to bytes
+    const reqId = 267;
+    const data = "0x12"; // Convert the string to bytes
 
     try {
         // Call the 'executeCall' function with the provided parameters
-        const transaction = await contract.executeCall(reqId, "0x68656c6c6f776f726c64", { gasLimit: 2000000 });
+        const transaction = await contract.executeCall(reqId, data , { gasLimit: 800000 });
         const receipt = await transaction.wait()
 
         console.log(receipt);

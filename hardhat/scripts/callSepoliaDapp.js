@@ -2,17 +2,15 @@ const hre = require('hardhat');
 
 async function main() {
     // const dappAddress = "0x47BA564d36eF1B5c9B51b015c32a9bF79D0aAff6"; // one of first succesufl chainlink call
-    const dappAddress = "0xD314dA9Ff68b07746fF2cA67554D3F3fEe778a97"
+    const dappAddress = "0x817D425ca147eBAA3C19BAFdCa49E3E0175b6be2"
     const Contract = await hre.ethers.getContractFactory('RandomNumberConsumerV2');
     const contract = await Contract.attach(dappAddress);
-
-    // const s_requestId = await contract.s_requestId();
-    // const s_randomWords = await contract.s_randomWords(1);
-
-    // console.log(`s_requestId: ${s_requestId}`);
-    // console.log(`s_randomWords: ${s_randomWords}`);
     
-    // const btpAddressBerlinDapp = "btp://0x7.icon/cxf1b0808f09138fffdb890772315aeabb37072a8a"
+    // const s_requestId = await contract.s_requestId();
+    // const s_randomWords = await contract.s_randomWords(0);
+    // console.log("s_randomWords:", s_randomWords);
+    
+    // const btpAddressBerlinDapp = "btp://0x7.icon/cx81469ed6f4df7bdfc9c57a80c705972f1d4e656a"
     // const setBtpAddressBerlinDapp = await contract.setDappAddressBerlin(btpAddressBerlinDapp, { gasLimit: 20000000 })
     // const receipt = await setBtpAddressBerlinDapp.wait()
     // console.log(receipt);

@@ -12,14 +12,18 @@ async function main() {
     const Contract = await hre.ethers.getContractFactory('RandomNumberConsumerV2');
     const contract = await Contract.deploy(subscriptionId, vrfCoordinator, keyHash);
 
-    // await contract.deployed(); // this errors out!
+    await contract.waitForDeployment();
 
-    // console.log(`Deployed to ${contract.address}`);
+    console.log(`Deployed to ${contract.target}`);
+
+    // sleep 15 seconds
+    // await new Promise(r => setTimeout(r, 25000));
+    
 
     // await hre.run('verify:verify', {
-    //     address: igo.address,
+    //     address: contract.target,
     //     // see: https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
-    //     constructorArguments: [],
+    //     constructorArguments: [subscriptionId, vrfCoordinator, keyHash],
     // });
 }
 

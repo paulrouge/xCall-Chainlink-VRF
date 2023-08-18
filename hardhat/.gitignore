@@ -1,0 +1,4 @@
+*.env
+hardhat.config.js
+artifacts/
+./scripts/*.*
