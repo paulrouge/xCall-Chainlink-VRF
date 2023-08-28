@@ -1,16 +1,9 @@
 package com.paulrouge.chainlink.vrf;
 
-
 /** 
  * This is a example of how to use the xCall Berlin VRF Random Number Generator
  * Do not use this in production, this is just an example to showcase xCall.
- * 
- * 
- * Note to self: maybe add a restriction to reqeustRandom number that only allows for calls 
- * when the current randomNumrequestId has been fulfilled.
- * 
 */
-
 
 import score.Context;
 import score.annotation.External;
@@ -20,8 +13,6 @@ import score.Address;
 import java.math.BigInteger;
 import com.paulrouge.chainlink.vrf.mapping.EnumerableMap;
 import java.util.Arrays;
-
-
 
 
 public class RandomNumber {
@@ -80,7 +71,6 @@ public class RandomNumber {
         return xCallAddress;
     }
 
-
     // make a request for a random number, user should pay for the xCall fee while calling this function
     @External
     @Payable
@@ -100,7 +90,7 @@ public class RandomNumber {
 
     // callback function for xCall Berlin
     void receiveRandomNumber(BigInteger _reqId, BigInteger _vrfResult) {
-        // only xCall Berlin can call this function
+        // only xCall Berlin can call this function - comment out during testing
         // Context.require(Context.getCaller().equals(xCallAddress), "Only xCall can call this function");
         
         // map randomNumrequestId to vrf result
@@ -110,6 +100,7 @@ public class RandomNumber {
     // xCall func    
     @External 
     public void handleCallMessage(String _from, byte[] _data) {
+        // only xCall Berlin can call this function - comment out during testing
         // Context.require(Context.getCaller().equals(xCallAddress), "Only xCall can call this function");
     
         // split the data into the randomNumrequestId and the vrf result
