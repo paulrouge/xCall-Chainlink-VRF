@@ -31,112 +31,43 @@ wallet = KeyWallet.load(os.getenv("WALLET_PATH"), os.getenv("WALLET_PASSWORD"))
 # print(f"Wallet address: {wallet_address}")
 
 # address of the deployed dapp contract
-DAPP_SEPOLIA = "0x3D80794f07f3585f7eD0CF6c6e180C64762d80a6"
+DAPP_SEPOLIA = "0x3D80794f07f3585f7eD0CF6c6e180C64762d80a6" # deployed SEPOLIA dapp contract address
+
+if DAPP_SEPOLIA == "":
+    print("Please deploy the SEPOLIA dapp contract first.")
+    quit()
 
 # btp address of the deployed dapp contract
 btpAddressDApp = f"btp://{BTP_ID_SEPOLIA}/{DAPP_SEPOLIA}"
 
+'''
+Uncomment; 
+
+- deployContract(icon_service, nid, wallet, "vrf-0.1.0-optimized.jar", {}) and 
+- quit() 
+
+to deploy the compiled vrf-0.1.0-optimized.jar from /jar folder
+'''
 # deployContract(icon_service, nid, wallet, "vrf-0.1.0-optimized.jar", {})
 # quit()
-dappBerlin = "cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1"
 
-# call = makeCall(icon_service, dappBerlin, "getVRFResult", {"_randomNumrequestId":19}, wallet)
-# print call to number
-# print(f'call: {int(call, 16)}')
+dappBerlin = "cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1" # your deployed dapp contract address
 
-# data set req 20 to 10
-# _data = "0x0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000a"
-# _hash = makeTransaction(icon_service, nid, dappBerlin, "handleCallMessage", {"_from": "addressxyz", "_data": _data}, 0, wallet)
-# print(f'tx: {_hash}')
+if dappBerlin == "":
+    print("Please deploy the SEPOLIA dapp contract first.")
+    quit()
 
-# actual response from solidity contract / vrf
-# _data = "0x000000000000000000000000000000000000000000000000000000000000000adc90011c924314a405187cf93e5a83c1a0e2ff354ecc9478d8902caa8cc4cbe4"
-# _hash = makeTransaction(icon_service, nid, dappBerlin, "handleCallMessage", {"_from": "addressxyz", "_data": _data}, 0, wallet)
-# print(f'tx: {_hash}')
+'''
+Uncomment the function you want to call below
+'''
 
-
-# set btp address sepolia dapp
+# set btp address sepolia dapp 
 # _hash = makeTransaction(icon_service, nid, dappBerlin, "setBtpAddressSepoliaDapp", {"_btpAddressSepoliaDapp": btpAddressDApp}, 0, wallet)
 # print(f'tx: {_hash}')
 
 # call requestRandomNumber
-_hash = makeTransaction(icon_service, nid, dappBerlin, "requestRandomNumber", {}, 6302692849230770176, wallet)
-print(f'tx: {_hash}')
+# _hash = makeTransaction(icon_service, nid, dappBerlin, "requestRandomNumber", {}, 6302692849230770176, wallet)
+# print(f'tx: {_hash}')
 
 
 
-
-
-def makeXCall():
-    # yellow print msg
-    print("\n\033[93m" + "Making xcall from ICON Berlin..." + "\033[0m")
-    print("-"*70)
-    
-    data = "helloworld"
-
-    # params for the sendCallMessage method of the xcall contract
-    params = {
-        "_to": btpAddressDApp,
-        "_data": utf8ToHex(data),
-    }
-
-    # get the fee for the xcall call
-    fee =  makeCall(icon_service, XCALL_CONTRACT_BERLIN, "getFee", {"_net":BTP_ID_SEPOLIA,"_rollback":False}, wallet)
-    value = int(fee, 16)
-
-    # send the xcall transaction, will register the xcall call on the xcall contract on destination chain 
-    # via source chain -> relay -> destination chain
-    hash = makeTransaction(icon_service, nid, XCALL_CONTRACT_BERLIN, "sendCallMessage", params, value, wallet)
-    print(f'tx: {hash}')
-    
-    print("trying to get the xcall request id... waiting 10 seconds...\n")
-    sleep(10)
-    
-    # get the tx result
-    tx_result = icon_service.get_transaction_result(hash)
-    eventlogs = tx_result['eventLogs']
-
-    for event in eventlogs:
-        if event['scoreAddress'] == XCALL_CONTRACT_BERLIN:
-            if event['indexed'][0] == 'CallMessageSent(Address,str,int,int)':
-                request_id = int(event['indexed'][3],16)
-                print("\033[94m" + f"reqId: {request_id}" + "\033[0m\n")
-                '''
-                the request id here, is not actually the request id needed to call executeCall with.
-                I think we should listen for events on destination and get the on where _reqId == request_id
-                and get the data from there, which will hold the actual request id needed to call executeCall with.
-                
-                sepolia exempla tx: 0xc038503bb0794faec781c55a9a79d7745d9834518759b5a727e4b52c50b8b562
-                '''
-    # print in red
-    print("\033[93m" + "Check the event log on the xCall Contract on the destination chain!" + "\033[0m\n")
-
-# makeXCall()
-# getEvents(icon_service, "0x5a3db13f5ceb8a6ccd4a62da0e50027e6a9735b6204654fee7004bdd3854e047")
-
-# call executeCall on the xcall contract on the destination chain
-def makeExecuteCall():
-    # yellow print msg
-    print("\n\033[93m" + "Making executeCall from ICON Berlin..." + "\033[0m")
-    print("-"*70)
-    
-    # params for the executeCall method of the xcall contract
-    params = {
-        "_reqId": 3475,
-        "_data": "0x307835",
-    }
-
-    # send the executeCall transaction, will execute the xcall call on the xcall contract on destination chain 
-    # via source chain -> relay -> destination chain
-    hash = makeTransaction(icon_service, nid, XCALL_CONTRACT_BERLIN, "executeCall", params, 0, wallet)
-    print(f'tx: {hash}')
-    
-    print("trying to get the xcall request id... waiting 10 seconds...\n")
-    sleep(10)
-    
-    # get the tx result
-    tx_result = icon_service.get_transaction_result(hash)
-
-    print(tx_result)
-
-# makeExecuteCall()

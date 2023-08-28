@@ -6,27 +6,18 @@ async function main() {
     const Contract = await hre.ethers.getContractFactory('RandomNumberConsumerV2');
     const contract = await Contract.attach(dappAddress);
     
-    // const s_requestId = await contract.s_requestId();
-    // const s_randomWords = await contract.s_randomWords(1);
-    // console.log("s_randomWords:", s_randomWords);
-    
-    const btpAddressBerlinDapp = "btp://0x7.icon/cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1"
+    const berlinAdr = "cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1" // Berlin contract address
+
+    if (berlindAdr == "") {
+        console.log("Please set the Berlin address")
+        return
+    }
+
+    const btpAddressBerlinDapp = "btp://0x7.icon/" + berlinAdr
     const setBtpAddressBerlinDapp = await contract.setDappAddressBerlin(btpAddressBerlinDapp, { gasLimit: 20000000 })
     const receipt = await setBtpAddressBerlinDapp.wait()
     console.log(receipt);
 
-    // const getBtpAddressBerlinDapp = await contract.dappAddressBerlin()
-    // console.log(getBtpAddressBerlinDapp);
-
-    // const getXCallFee = await contract.getXCallFee("0x7.icon", true)
-    // console.log(getXCallFee.toString());
-
-    // 8449437287748447 bsctest
-    // 871649011063830 sepolia
-
-    // const sendCallMsg = await contract.sendXCallMessage(6900, { gasLimit: 20000000, value: 871649011063830 })
-    // const receipt = await sendCallMsg.wait()
-    // console.log(receipt);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
