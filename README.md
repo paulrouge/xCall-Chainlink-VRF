@@ -20,4 +20,4 @@ The SCORE to deploy on Berlin (ICON's Testnet) is located in the `icon/vrf_score
 5. make sure that on the Berlin SCORE, the correct Sepolia address is set (use `icon/main.py`*)
 6. call the `requestRandomNumber` function on the Berlin SCORE (use `icon/main.py`*)
 
-* = you can ofcourse use your own ways to deploy and interact with the contracts, this is just an example. If you want to use the example scripts from this repo you might run into some dependency issues, so make sure to install all dependencies in that case.
+\* _you can ofcourse use your own ways to deploy and interact with the contracts, this is just an example. If you want to use the example scripts from this repo you might run into some dependency issues, so make sure to install all dependencies in that case._
