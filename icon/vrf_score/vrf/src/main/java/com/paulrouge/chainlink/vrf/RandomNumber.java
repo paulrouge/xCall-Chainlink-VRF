@@ -14,12 +14,8 @@ package com.paulrouge.chainlink.vrf;
 
 import score.Context;
 import score.annotation.External;
-// import score.annotation.Optional;
 import score.annotation.Payable;
-// import score.annotation.EventLog;
-// import score.annotation.Payable;
 import score.Address;
-// import score.VarDB;
 
 import java.math.BigInteger;
 import com.paulrouge.chainlink.vrf.mapping.EnumerableMap;
