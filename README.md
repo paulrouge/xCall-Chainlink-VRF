@@ -1,5 +1,7 @@
 # xCall Chainlink VRF
 
+__IMPORTANT: This repository is only for showcasing purposes, it is not meant to be used in production. Do not use it in production!__
+
 This repository contains the xCall Chainlink VRF smart contract, which is used to generate random numbers for the xCall protocol. It also contains a ICON SCORE (smart contract) that invokes the Chainlink VRF smart contract via xCall.
 
 Read this article first on how to use this repository: https://medium.com/@0xpaulrouge/connecting-chainlink-to-icon-via-xcall-e28cc4e62917
