@@ -14,53 +14,43 @@ package com.paulrouge.chainlink.vrf;
 
 import score.Context;
 import score.annotation.External;
-import score.annotation.Optional;
+// import score.annotation.Optional;
 import score.annotation.Payable;
-import score.annotation.EventLog;
+// import score.annotation.EventLog;
 // import score.annotation.Payable;
 import score.Address;
-import score.VarDB;
+// import score.VarDB;
 
 import java.math.BigInteger;
 import com.paulrouge.chainlink.vrf.mapping.EnumerableMap;
+import java.util.Arrays;
+
 
 
 
 public class RandomNumber {
-    public String name = "xCall - Chainlink VRF Random Number Generator";
-    private BigInteger randomNumrequestId = BigInteger.ZERO;
-    public Address xCallAddress = Address.fromString("cxf4958b242a264fc11d7d8d95f79035e35b21c1bb");
-
-    // map [randomNumrequestId => vrf id]
-    EnumerableMap <BigInteger, BigInteger> vrfIds = new EnumerableMap<BigInteger, BigInteger>("vrfIds", BigInteger.class, BigInteger.class);
+    public String contractname = "xCall - Chainlink VRF Random Number Generator";
+    
+    // used to keep track of the random number requests
+    private BigInteger COUNTER = BigInteger.ZERO;
+    public final Address xCallAddress = Address.fromString("cxf4958b242a264fc11d7d8d95f79035e35b21c1bb");
 
     // map [randomNumrequestId => vrf result]
-    EnumerableMap <BigInteger, BigInteger> vrfResults = new EnumerableMap<BigInteger, BigInteger>("vrfResults", BigInteger.class, BigInteger.class);
+    EnumerableMap <BigInteger, BigInteger> VRFResults = new EnumerableMap<BigInteger, BigInteger>("vrfResults", BigInteger.class, BigInteger.class);
 
     // map [randomNumrequestId => address]
-    EnumerableMap <BigInteger, Address> randomNumrequestIdToAddress = new EnumerableMap<BigInteger, Address>("randomNumrequestIdToAddress", BigInteger.class, Address.class);
+    EnumerableMap <BigInteger, Address> requestIdToAddress = new EnumerableMap<BigInteger, Address>("randomNumrequestIdToAddress", BigInteger.class, Address.class);
 
     public String btpAddressSepoliaDapp = "test";
 
-    // @External(readonly=true)
-    // public String getTest() {
-    //     return this.test;
-    // }
-
-    // @External
-    // public void setTest(String _test) {
-    //     this.test = _test;
-    // }
-
-
-    // constructor
-    public RandomNumber() {
-        Context.println("contract deployed!");
+    @External(readonly=true)
+    public String name() {
+        return this.contractname;
     }
 
     @External
     public void setBtpAddressSepoliaDapp(String _btpAddressSepoliaDapp) {
-        // Context.require(Context.getCaller().equals(Context.getOwner()), "Only owner can set btpAddressSepoliaDapp");
+        Context.require(Context.getCaller().equals(Context.getOwner()), "Only owner can set btpAddressSepoliaDapp");
         this.btpAddressSepoliaDapp = _btpAddressSepoliaDapp;
     }
 
@@ -69,89 +59,76 @@ public class RandomNumber {
         return this.btpAddressSepoliaDapp;
     }
 
-
-    // returns the vrfId of the given randomNumrequestId
-    @External(readonly=true)
-    public BigInteger getVrfId(BigInteger _randomNumrequestId) {
-        return vrfIds.getOrDefault(_randomNumrequestId, BigInteger.ZERO);
-    }
-
     // returns the vrf result of the given randomNumrequestId
     @External(readonly=true)
-    public BigInteger getVrfResult(BigInteger _randomNumrequestId) {
-        return vrfResults.getOrDefault(_randomNumrequestId, BigInteger.ZERO);
+    public BigInteger getVRFResult(BigInteger _randomNumrequestId) {
+        return VRFResults.getOrDefault(_randomNumrequestId, BigInteger.ZERO);
     }
 
     // returns the address of the given randomNumrequestId
-    // @External(readonly=true)
-    // public Address getAddress(BigInteger _randomNumrequestId) {
-    //     return randomNumrequestIdToAddress.get(_randomNumrequestId);
-    // }
-
     @External(readonly=true)
-    public BigInteger getSepoliaFee() {
-        return Context.call(BigInteger.class, xCallAddress, "getFee", "0xaa36a7.eth2", "0x0");
+    public Address getAddress(BigInteger _randomNumrequestId) {
+        return requestIdToAddress.get(_randomNumrequestId);
     }
 
 
-    private BigInteger _sendCallMessage(byte[] _data, @Optional byte[] _rollback) {
-        Address xcallSourceAddress = Address.fromString("cxf4958b242a264fc11d7d8d95f79035e35b21c1bb");
-        String _to = "btp://0xaa36a7.eth2/0x5F326A7Cecb9510355324977901942bf5018d14F";
-        return Context.call(BigInteger.class, Context.getValue(), xcallSourceAddress, "sendCallMessage", _to, _data, _rollback);
+    @External(readonly = true)
+    public BigInteger getCounter() {
+        return this.COUNTER;
     }
 
-    // make a request for a random number
+
+    // get xcall address
+    @External(readonly=true)
+    public Address getXcallAddress() {
+        return xCallAddress;
+    }
+
+
+    // make a request for a random number, user should pay for the xCall fee while calling this function
     @External
     @Payable
     public void requestRandomNumber() {
-        // BigInteger fee = new BigInteger("6089463169230770176");
-        
-        // check if contract has enough balance
-        // Context.require(Context.getBalance(Context.getAddress()).compareTo(fee) >= 0, "Not enough balance");
+        // counter to bytes
+        byte[] _COUNTER = this.COUNTER.toByteArray();
         
         // call sendMessage on xCall Berlin address with fee as value, dapp address and data as param
-        BigInteger id =Context.call(BigInteger.class, Context.getValue(), Address.fromString("cxf4958b242a264fc11d7d8d95f79035e35b21c1bb"), "sendCallMessage", "btp://0xaa36a7.eth2/0x5F326A7Cecb9510355324977901942bf5018d14F", "0x".getBytes());
-        // BigInteger id = _sendCallMessage("0x".getBytes(), "0x".getBytes());
-        // Context.call(BigInteger.class, Context.getValue(), xcallSourceAddress, "sendCallMessage", _to, _data);
-        TestCall(id);
-
-        // emit event with randomNumrequestId
-        // RandomNumberRequestReceived(Context.getAddress().toString(), this.randomNumrequestId);
+        Context.call(BigInteger.class, Context.getValue(), Address.fromString("cxf4958b242a264fc11d7d8d95f79035e35b21c1bb"), "sendCallMessage", this.btpAddressSepoliaDapp, _COUNTER);
         
-        // // increment randomNumrequestId
-        // randomNumrequestId = randomNumrequestId.add(BigInteger.ONE);
+        // map randomNumrequestId to address
+        requestIdToAddress.set(COUNTER, Context.getCaller());
 
-        // // map randomNumrequestId to address
-        // randomNumrequestIdToAddress.set(randomNumrequestId, Context.getAddress());
-        // Context.transfer(Context.getCaller(), Context.getValue());
+        // increment randomNumrequestId
+        this.COUNTER = this.COUNTER.add(BigInteger.ONE);
     }
 
     // callback function for xCall Berlin
-    void receiveRandomNumber(BigInteger _vrfResult) {
+    void receiveRandomNumber(BigInteger _reqId, BigInteger _vrfResult) {
         // only xCall Berlin can call this function
-        Context.require(Context.getCaller().equals(xCallAddress), "Only xCall can call this function");
-        
-        // map result to previous randomNumrequestId
-        // BigInteger _randomNumrequestId = randomNumrequestId.subtract(BigInteger.ONE);
+        // Context.require(Context.getCaller().equals(xCallAddress), "Only xCall can call this function");
         
         // map randomNumrequestId to vrf result
-        // vrfResults.set(_randomNumrequestId, _vrfResult);
+        VRFResults.set(_reqId, _vrfResult);
     }
 
     // xCall func    
     @External 
     public void handleCallMessage(String _from, byte[] _data) {
-        Context.require(Context.getCaller().equals(xCallAddress), "Only xCall can call this function");
-        receiveRandomNumber(new BigInteger(_data));
+        // Context.require(Context.getCaller().equals(xCallAddress), "Only xCall can call this function");
+    
+        // split the data into the randomNumrequestId and the vrf result
+        byte[] _randomNumrequestId = Arrays.copyOfRange(_data, 0, 32);
+        byte[] _vrfResult = Arrays.copyOfRange(_data, 32, _data.length);
+
+        BigInteger reqId = new BigInteger(_randomNumrequestId); 
+        BigInteger res = new BigInteger(1, _vrfResult); // >128b so set sign to positive with 1
+
+        // store the vrf result
+        receiveRandomNumber(reqId, res);
     }
 
 
     @Payable
     public void fallback(){};
 
-    @EventLog
-    public void RandomNumberRequestReceived(String _from, BigInteger _randomNumberRequestId) {}
-
-    @EventLog
-    public void TestCall(BigInteger _resp) {}
 }

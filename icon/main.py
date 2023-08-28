@@ -31,26 +31,41 @@ wallet = KeyWallet.load(os.getenv("WALLET_PATH"), os.getenv("WALLET_PASSWORD"))
 # print(f"Wallet address: {wallet_address}")
 
 # address of the deployed dapp contract
-DAPP_SEPOLIA = "0x5F326A7Cecb9510355324977901942bf5018d14F"
+DAPP_SEPOLIA = "0x3D80794f07f3585f7eD0CF6c6e180C64762d80a6"
 
 # btp address of the deployed dapp contract
 btpAddressDApp = f"btp://{BTP_ID_SEPOLIA}/{DAPP_SEPOLIA}"
 
 # deployContract(icon_service, nid, wallet, "vrf-0.1.0-optimized.jar", {})
-dappBerlin = "cxb0fba7e5c4e7f0ba8c242d92acd80b00a8098dea"
-# transferICX(icon_service, nid, wallet, dappBerlin, 1*10**18)
+# quit()
+dappBerlin = "cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1"
 
-# test
-# _hash = makeTransaction(icon_service, nid, dappBerlin, "voteYes", {}, 6089463169230770176, wallet)
+# call = makeCall(icon_service, dappBerlin, "getVRFResult", {"_randomNumrequestId":19}, wallet)
+# print call to number
+# print(f'call: {int(call, 16)}')
+
+# data set req 20 to 10
+# _data = "0x0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000a"
+# _hash = makeTransaction(icon_service, nid, dappBerlin, "handleCallMessage", {"_from": "addressxyz", "_data": _data}, 0, wallet)
 # print(f'tx: {_hash}')
 
-# set btp address sepolia dapp on the vrf contract
+# actual response from solidity contract / vrf
+# _data = "0x000000000000000000000000000000000000000000000000000000000000000adc90011c924314a405187cf93e5a83c1a0e2ff354ecc9478d8902caa8cc4cbe4"
+# _hash = makeTransaction(icon_service, nid, dappBerlin, "handleCallMessage", {"_from": "addressxyz", "_data": _data}, 0, wallet)
+# print(f'tx: {_hash}')
+
+
+# set btp address sepolia dapp
 # _hash = makeTransaction(icon_service, nid, dappBerlin, "setBtpAddressSepoliaDapp", {"_btpAddressSepoliaDapp": btpAddressDApp}, 0, wallet)
 # print(f'tx: {_hash}')
 
 # call requestRandomNumber
 _hash = makeTransaction(icon_service, nid, dappBerlin, "requestRandomNumber", {}, 6302692849230770176, wallet)
 print(f'tx: {_hash}')
+
+
+
+
 
 def makeXCall():
     # yellow print msg
@@ -97,7 +112,7 @@ def makeXCall():
     print("\033[93m" + "Check the event log on the xCall Contract on the destination chain!" + "\033[0m\n")
 
 # makeXCall()
-# getEvents(icon_service, "0x4cbf3ae68f2d6bd993c514d3fdbb66901a76c5a8a3e5b2d4d623f299f1fa7047")
+# getEvents(icon_service, "0x5a3db13f5ceb8a6ccd4a62da0e50027e6a9735b6204654fee7004bdd3854e047")
 
 # call executeCall on the xcall contract on the destination chain
 def makeExecuteCall():

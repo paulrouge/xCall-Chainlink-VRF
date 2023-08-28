@@ -30,8 +30,8 @@ async function main() {
     const contract = new hre.ethers.Contract(xCallAddress, contractABI, signer); // Using the signer to send a transaction
     
 
-    const reqId = 267;
-    const data = "0x12"; // Convert the string to bytes
+    const reqId = 304;
+    const data = "0x13"; // Convert the string to bytes
 
     try {
         // Call the 'executeCall' function with the provided parameters

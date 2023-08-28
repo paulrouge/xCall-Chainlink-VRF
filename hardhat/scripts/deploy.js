@@ -17,14 +17,14 @@ async function main() {
     console.log(`Deployed to ${contract.target}`);
 
     // sleep 15 seconds
-    // await new Promise(r => setTimeout(r, 25000));
+    await new Promise(r => setTimeout(r, 25000));
     
 
-    // await hre.run('verify:verify', {
-    //     address: contract.target,
-    //     // see: https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
-    //     constructorArguments: [subscriptionId, vrfCoordinator, keyHash],
-    // });
+    await hre.run('verify:verify', {
+        address: contract.target,
+        // see: https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
+        constructorArguments: [subscriptionId, vrfCoordinator, keyHash],
+    });
 }
 
 // We recommend this pattern to be able to use async/await everywhere

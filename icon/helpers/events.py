@@ -5,16 +5,17 @@ RED = "\033[91m"
 RESET = "\033[0m"  # Reset text color to default
 
 xcallAddress = "cxf4958b242a264fc11d7d8d95f79035e35b21c1bb"
-
+bmcAddress = ""
 def getEvents(_iconService, _tx):
-    _iconService.get_transaction_result(_tx)
-
+    # _iconService.get_transaction_result(_tx)
     # get the eventlogs from the transaction
     eventLogs = _iconService.get_transaction_result(_tx)["eventLogs"]
     for event in eventLogs:
+        # print(f"{YELLOW}event:{RESET} {BLUE}\n{event}{RESET}")
+
         if event["scoreAddress"] != xcallAddress:
             continue
-        if event["indexed"][0] != "CallMessage(str,str,int,int,bytes)":
+        if event["indexed"][0] != "CallMessage(str,str,int,int,bytes)" and event["indexed"][0] != "CallMessageSent(Address,str,int,int)":
             continue
         for key, value in event.items():
             if key == "indexed":
