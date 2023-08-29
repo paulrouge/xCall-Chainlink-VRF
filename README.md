@@ -15,8 +15,8 @@ The SCORE to deploy on Berlin (ICON's Testnet) is located in the `icon/vrf_score
 ## How to use
 1. Clone this repository
 2. Deploy the EVM contract with the correct parameters (check the deploy script in `hardhat/scripts/deploy.js`*)
-3. Deploy the ICON SCORE with the correct parameters, if you want you can use the python script in `icon/main.py` to deploy the SCORE and interacting with it.*
-4. make sure that on the Sepolia contract, the correct Berlin address is set (use `hardhat/scripts/callSepoliaDapp.js` for that), also, make sure to have set up the correct Chainlink VRF settings when deploying. Use the steps in the above mentioned article for that.
+3. Deploy the ICON SCORE, if you want you can use the python script in `icon/main.py` to deploy the SCORE and interacting with it.*
+4. make sure that on the Sepolia contract, the correct Berlin address is set (use `hardhat/scripts/callSepoliaDapp.js` for that)
 5. make sure that on the Berlin SCORE, the correct Sepolia address is set (use `icon/main.py`*)
 6. call the `requestRandomNumber` function on the Berlin SCORE (use `icon/main.py`*)
 
