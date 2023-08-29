@@ -31,31 +31,31 @@ wallet = KeyWallet.load(os.getenv("WALLET_PATH"), os.getenv("WALLET_PASSWORD"))
 # print(f"Wallet address: {wallet_address}")
 
 # address of the deployed dapp contract
-DAPP_SEPOLIA = "0x3D80794f07f3585f7eD0CF6c6e180C64762d80a6" # deployed SEPOLIA dapp contract address
-
-if DAPP_SEPOLIA == "":
-    print("Please deploy the SEPOLIA dapp contract first.")
-    quit()
+DAPP_SEPOLIA = "0x5c4fA4b22256Ff15E5A1aa02517d07d17cF7A7bE" # deployed SEPOLIA dapp contract address
 
 # btp address of the deployed dapp contract
 btpAddressDApp = f"btp://{BTP_ID_SEPOLIA}/{DAPP_SEPOLIA}"
 
 '''
-Uncomment; 
-
-- deployContract(icon_service, nid, wallet, "vrf-0.1.0-optimized.jar", {}) and 
-- quit() 
-
-to deploy the compiled vrf-0.1.0-optimized.jar from /jar folder
+    Uncomment; 
+        - deployContract(icon_service, nid, wallet, "vrf-0.1.0-optimized.jar", {}) and 
+        - quit()
+    to deploy the compiled vrf-0.1.0-optimized.jar from /jar folder.
 '''
+
 # deployContract(icon_service, nid, wallet, "vrf-0.1.0-optimized.jar", {})
 # quit()
 
-dappBerlin = "cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1" # your deployed dapp contract address
+dappBerlin = "cx3723d8cb8d8ac7da29f692ce2abc8156423631be" # your deployed dapp contract address
 
 if dappBerlin == "":
     print("Please deploy the SEPOLIA dapp contract first.")
     quit()
+
+if DAPP_SEPOLIA == "":
+    print("Please deploy the SEPOLIA dapp contract first.")
+    quit()
+
 
 '''
 Uncomment the function you want to call below
@@ -66,8 +66,5 @@ Uncomment the function you want to call below
 # print(f'tx: {_hash}')
 
 # call requestRandomNumber
-# _hash = makeTransaction(icon_service, nid, dappBerlin, "requestRandomNumber", {}, 6302692849230770176, wallet)
-# print(f'tx: {_hash}')
-
-
-
+_hash = makeTransaction(icon_service, nid, dappBerlin, "requestRandomNumber", {}, 6302692849230770176, wallet)
+print(f'tx: {_hash}')

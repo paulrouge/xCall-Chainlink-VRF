@@ -46,7 +46,7 @@ contract RandomNumberConsumerV2 is VRFConsumerBaseV2, ICallServiceReceiver {
     address constant xCallAddressSepolia = 0x694C1f5Fb4b81e730428490a1cE3dE6e32428637;
 
     // the btp address of the dapp on Berlin
-    string public dappAddressBerlin = "btp://0x7.icon/cxbad2d5a38119a3f41c1f87bb8296053b634455cc";
+    string public dappAddressBerlin = "btp://0x7.icon/cx3723d8cb8d8ac7da29f692ce2abc8156423631be";
 
     // owner can set the dapp address on Berlin
     function setDappAddressBerlin(string calldata _dappAddressBerlin) external onlyOwner {

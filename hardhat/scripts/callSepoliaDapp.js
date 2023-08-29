@@ -6,7 +6,7 @@ async function main() {
     const Contract = await hre.ethers.getContractFactory('RandomNumberConsumerV2');
     const contract = await Contract.attach(dappAddress);
     
-    const berlinAdr = "cx6a60548cbceb3c3491c47e0ce934ca7cf14f05c1" // Berlin contract address
+    const berlinAdr = "cx3723d8cb8d8ac7da29f692ce2abc8156423631be" // Berlin contract address
 
     if (berlindAdr == "") {
         console.log("Please set the Berlin address")
