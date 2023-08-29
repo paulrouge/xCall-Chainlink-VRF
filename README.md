@@ -23,7 +23,7 @@ The SCORE to deploy on Berlin (ICON's Testnet) is located in the `icon/vrf_score
 \* _you can ofcourse use your own ways to deploy and interact with the contracts, this is just an example. If you want to use the example scripts from this repo you might run into some dependency issues, so make sure to install all dependencies in that case._
 
 ## Things to double check when having issues
-- is your subscription contract funded with testnet LINK? (if the amount of funded LINK is too low, the request will pauze for 24hours and fail if the amount is still too low.) !! Use the Chainlink VRF Dashboard to fund the subscription. Not just send LINK to the contract address !!
+- Is your subscription contract funded with testnet LINK? (if the amount of funded LINK is too low, the request will pauze for 24hours and fail if the amount is still too low.) !! Use the Chainlink VRF Dashboard to fund the subscription. Not just send LINK to the contract address !!
 - does your Sepolia dApp has enough eth to pay for the xCall transaction back to Berlin?
-- is the correct Sepolia address set on the Berlin SCORE?
-- is the correct Berlin address set on the Sepolia contract?
+- Is the correct Sepolia address set on the Berlin SCORE?
+- Is the correct Berlin address set on the Sepolia contract?
