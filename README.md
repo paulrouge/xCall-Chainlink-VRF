@@ -16,8 +16,14 @@ The SCORE to deploy on Berlin (ICON's Testnet) is located in the `icon/vrf_score
 1. Clone this repository
 2. Deploy the EVM contract with the correct parameters (check the deploy script in `hardhat/scripts/deploy.js`*)
 3. Deploy the ICON SCORE with the correct parameters, if you want you can use the python script in `icon/main.py` to deploy the SCORE and interacting with it.*
-4. make sure that on the Sepolia contract, the correct Berlin address is set (use `hardhat/scripts/callSepoliaDapp.js` for that)
+4. make sure that on the Sepolia contract, the correct Berlin address is set (use `hardhat/scripts/callSepoliaDapp.js` for that), also, make sure to have set up the correct Chainlink VRF settings when deploying. Use the steps in the above mentioned article for that.
 5. make sure that on the Berlin SCORE, the correct Sepolia address is set (use `icon/main.py`*)
 6. call the `requestRandomNumber` function on the Berlin SCORE (use `icon/main.py`*)
 
 \* _you can ofcourse use your own ways to deploy and interact with the contracts, this is just an example. If you want to use the example scripts from this repo you might run into some dependency issues, so make sure to install all dependencies in that case._
+
+## Things to double check when having issues
+- is your subscription contract funded with testnet LINK? (if the amount of funded LINK is too low, the request will pauze for 24hours and fail if the amount is still too low.) !! Use the Chainlink VRF Dashboard to fund the subscription. Not just send LINK to the contract address !!
+- does your Sepolia dApp has enough eth to pay for the xCall transaction back to Berlin?
+- is the correct Sepolia address set on the Berlin SCORE?
+- is the correct Berlin address set on the Sepolia contract?
